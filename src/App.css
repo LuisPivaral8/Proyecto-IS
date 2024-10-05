@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+  margin: 0; /* Eliminar márgenes predeterminados */
+  padding: 0; /* Eliminar padding predeterminado */
+  background-image: url('https://www.floristeriamorris.com/wp-content/uploads/etapas-de-crecimiento-de-las-plantas.jpg');
+  background-size: cover; /* Ajusta la imagen al tamaño de la ventana */
+  background-position: center; /* Centra la imagen */
+  min-height: 100vh; /* Asegura que el fondo cubra toda la pantalla */
+  color: white; /* Cambia el color del texto para que contraste con el fondo */
+}
+
+.container {
+  padding: 20px; /* Espaciado interno para todos los contenedores */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente para mejorar la legibilidad */
+  border-radius: 8px; /* Esquinas redondeadas */
+  color:white;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  color: white; /* Asegura que todos los elementos de texto sean blancos */
+}
