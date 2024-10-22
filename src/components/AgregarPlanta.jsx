@@ -1,96 +1,86 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+
+// Función para obtener las plantas
+const fetchPlantas = async () => {
+    const response = await axios.get(`http://localhost:5000/api/plants`);
+    return response.data.data; // Devuelve la lista de plantas
+};
 
 const AgregarPlanta = () => {
-    // Estados para los campos del formulario
-    const [nombreComun, setNombreComun] = useState('');
-    const [nombreCientifico, setNombreCientifico] = useState('');
-    const [descripcion, setDescripcion] = useState('');
-    const [fechaCreacion, setFechaCreacion] = useState('');
-    const navigate = useNavigate();
+    const [plantaSeleccionada, setPlantaSeleccionada] = useState('');
+    const [plantaInfo, setPlantaInfo] = useState(null); // Para almacenar la información de la planta seleccionada
 
-    // Manejar el envío del formulario
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    
 
-        try {
-            // Enviar la información al servidor
-            const response = await axios.post("http://localhost/API/agregarPlanta.php", {
-                nombre_comun: nombreComun,
-                nombre_cientifico: nombreCientifico,
-                descripcion: descripcion,
-                fecha_creacion: fechaCreacion,
-            });
+    // Usar useQuery para obtener las plantas
+    const { data: plantas = [], error, isLoading } = useQuery({
+        queryKey: ['plantas'], // Clave de la consulta
+        queryFn: fetchPlantas, // Función que realiza la consulta
+    });
 
-            // Comprobar la respuesta del servidor
-            if (response.data.success) {
-                alert('Planta agregada exitosamente');
-                // Limpiar el formulario
-                setNombreComun('');
-                setNombreCientifico('');
-                setDescripcion('');
-                setFechaCreacion('');
-            } else {
-                alert('Error al agregar la planta');
-            }
-        } catch (error) {
-            console.error("Error al agregar la planta:", error);
-            alert('Ocurrió un error al intentar agregar la planta');
-        }
+    // Función para manejar el cambio de selección en el select
+    const manejarCambio = (event) => {
+        const idPlanta = event.target.value;
+        setPlantaSeleccionada(idPlanta);
+    
+        const plantaSeleccionada = plantas.find(planta => planta.id === parseInt(idPlanta));
+        setPlantaInfo(plantaSeleccionada); // Establece la información de la planta seleccionada
     };
 
+    const manejarEnvio = async (event) => {
+        event.preventDefault(); // Previene el comportamiento por defecto del formulario
+    
+        if (!plantaInfo) return; // Asegúrate de que hay una planta seleccionada
+    
+        const plantaData = {
+            common_name: plantaInfo.common_name,
+            scientific_name: plantaInfo.scientific_name,
+            description: plantaInfo.description,
+            created_at: new Date().toISOString(), // Agrega la fecha de creación
+        };
+    
+        try {
+            await axios.post('http://localhost/API/agregarPlanta.php', plantaData); // Asegúrate de tener esta ruta en tu servidor
+            alert('Planta agregada correctamente'); // Mensaje de éxito
+            setPlantaSeleccionada(''); // Reinicia la selección
+            setPlantaInfo(null); // Reinicia la información de la planta
+        } catch (error) {
+            console.error('Error al guardar la planta:', error);
+            alert('Error al agregar la planta');
+        }
+    };
+    
+    
+
+    if (isLoading) return <p>Cargando plantas...</p>; // Mensaje de carga
+    if (error) return <p>Error al buscar las plantas: {error.message}</p>; // Manejo de errores
+
     return (
-        <div className="container mt-5">
-            <h2 className="text-center">Agregar Nueva Planta</h2>
-            <form onSubmit={handleSubmit} className="w-50 mx-auto">
-                <div className="mb-3">
-                    <label htmlFor="nombre_comun" className="form-label">Nombre Común</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="nombre_comun"
-                        value={nombreComun}
-                        onChange={(e) => setNombreComun(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="nombre_cientifico" className="form-label">Nombre Científico</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="nombre_cientifico"
-                        value={nombreCientifico}
-                        onChange={(e) => setNombreCientifico(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="descripcion" className="form-label">Descripción</label>
-                    <textarea
-                        className="form-control"
-                        id="descripcion"
-                        value={descripcion}
-                        onChange={(e) => setDescripcion(e.target.value)}
-                        required
-                    ></textarea>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="fecha_creacion" className="form-label">Fecha de Creación</label>
-                    <input
-                        type="date"
-                        className="form-control"
-                        id="fecha_creacion"
-                        value={fechaCreacion}
-                        onChange={(e) => setFechaCreacion(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary w-100">Agregar Planta</button>
-                <button onClick={() => navigate('/Dashboard')} type="submit" className="btn btn-secondary w-100 mt-3">Cancelar</button>
+        <div className='container mt-5 text-center'>
+            <h2>Agregar Planta</h2>
+            <form onSubmit={manejarEnvio}>
+                <label htmlFor="plantas">Selecciona una planta:</label>
+                <select id="plantas" value={plantaSeleccionada} onChange={manejarCambio}>
+                    <option value="">Seleccione una planta</option>
+                    {plantas.map((planta) => (
+                        <option key={planta.id} value={planta.id}>
+                            {planta.common_name || planta.scientific_name}
+                        </option>
+                    ))}
+                </select>
+                {plantaInfo && (
+                    <div>
+                        <h3>Información de la Planta:</h3>
+                        <p><strong>Nombre Común:</strong> {plantaInfo.common_name}</p>
+                        <p><strong>Nombre Científico:</strong> {plantaInfo.scientific_name}</p>
+                    </div>
+                )}
+                <button type="submit">Agregar Planta</button>
             </form>
+   
         </div>
     );
 };
