@@ -1,0 +1,49 @@
+body {
+    background-color: #f8f9fa; /* Color de fondo */
+    font-family: 'Arial', sans-serif; /* Fuente de texto */
+}
+
+
+
+.card {
+    border: 1px solid #6c757d; /* Borde de la tarjeta */
+    border-radius: 10px; /* Esquinas redondeadas */
+    transition: transform 0.2s; /* Transición suave al hacer hover */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Aumentar tamaño al hacer hover */
+}
+
+.card-title {
+    color: #28a745; /* Color del título de la tarjeta */
+}
+
+.card-text {
+    color: #555; /* Color del texto */
+}
+
+h6 {
+    color: #007bff; /* Color para subtítulos */
+}
+
+.container {
+    margin-top: 50px; /* Margen superior */
+}
+
+.col{
+    color: black;
+  }
+
+
+h1, h2, h3, h4, h5, p {
+    color: rgb(0, 0, 0);
+  }
+
+/* Estilo adicional para el texto de recomendaciones */
+h6 + p {
+    margin-bottom: 15px; /* Espaciado inferior para recomendaciones */
+}
+
+
+

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+//import './AgregarPlanta.css'; // Importa el archivo CSS
 
 // Función para obtener las plantas
 const fetchPlantas = async () => {
@@ -12,8 +12,6 @@ const fetchPlantas = async () => {
 const AgregarPlanta = () => {
     const [plantaSeleccionada, setPlantaSeleccionada] = useState('');
     const [plantaInfo, setPlantaInfo] = useState(null); // Para almacenar la información de la planta seleccionada
-
-    
 
     // Usar useQuery para obtener las plantas
     const { data: plantas = [], error, isLoading } = useQuery({
@@ -53,17 +51,20 @@ const AgregarPlanta = () => {
         }
     };
     
-    
-
     if (isLoading) return <p>Cargando plantas...</p>; // Mensaje de carga
     if (error) return <p>Error al buscar las plantas: {error.message}</p>; // Manejo de errores
 
     return (
-        <div className='container mt-5 text-center'>
+        <div className="form-container">
             <h2>Agregar Planta</h2>
-            <form onSubmit={manejarEnvio}>
-                <label htmlFor="plantas">Selecciona una planta:</label>
-                <select id="plantas" value={plantaSeleccionada} onChange={manejarCambio}>
+            <form onSubmit={manejarEnvio} className="form-content">
+                <label htmlFor="plantas" className="form-label">Selecciona una planta:</label>
+                <select
+                    id="plantas"
+                    value={plantaSeleccionada}
+                    onChange={manejarCambio}
+                    className="form-select"
+                >
                     <option value="">Seleccione una planta</option>
                     {plantas.map((planta) => (
                         <option key={planta.id} value={planta.id}>
@@ -71,16 +72,17 @@ const AgregarPlanta = () => {
                         </option>
                     ))}
                 </select>
+
                 {plantaInfo && (
-                    <div>
+                    <div className="planta-info">
                         <h3>Información de la Planta:</h3>
                         <p><strong>Nombre Común:</strong> {plantaInfo.common_name}</p>
                         <p><strong>Nombre Científico:</strong> {plantaInfo.scientific_name}</p>
                     </div>
                 )}
-                <button type="submit">Agregar Planta</button>
+
+                <button type="submit" className="form-button">Agregar Planta</button>
             </form>
-   
         </div>
     );
 };

@@ -1,0 +1,89 @@
+.dashboard-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.5s;
+    height: 200px;
+    width: 100%;
+    color: white;
+    position: relative;
+  }
+  
+  .dashboard-btn:hover {
+    animation: shake 0.5s ease-in-out;
+    background-color: #fff; /* Cambia el fondo a blanco en el hover */
+    color: #000; /* Cambia el texto a negro */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dashboard-btn img {
+    max-width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .dashboard-btn span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Efecto "agitar" con keyframes */
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  
+  /* Diferentes colores para cada botón */
+  .btn-new-plant {
+    background-color: #28a745; /* Verde */
+  }
+  
+  .btn-new-plant:hover {
+    background-color: #218838; /* Verde más oscuro al hacer hover */
+  }
+  
+  .btn-create-garden {
+    background-color: #007bff; /* Azul */
+  }
+  
+  .btn-create-garden:hover {
+    background-color: #0056b3; /* Azul más oscuro al hacer hover */
+  }
+  
+  .btn-modify-garden {
+    background-color: #ffc107; /* Amarillo */
+  }
+  
+  .btn-modify-garden:hover {
+    background-color: #e0a800; /* Amarillo más oscuro al hacer hover */
+  }
+  
+  .btn-encyclopedia {
+    background-color: #dc3545; /* Rojo */
+  }
+  
+  .btn-encyclopedia:hover {
+    background-color: #c82333; /* Rojo más oscuro al hacer hover */
+  }
+  
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .dashboard-btn {
+      height: 150px;
+    }
+    .dashboard-btn img {
+      max-width: 70px;
+    }
+    .dashboard-btn span {
+      font-size: 1rem;
+    }
+  }
+  
