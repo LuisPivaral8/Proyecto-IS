@@ -4,31 +4,37 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Métodos permitid
 header("Access-Control-Allow-Headers: Content-Type"); // Cabeceras permitidas
 header("Content-Type: application/json; charset=UTF-8");
 
-$connection = new mysqli('localhost', 'username', '', 'is');
+// Conectar a la base de datos
+$servername = "localhost";
+$username = "root"; // Cambia esto si es necesario
+$password = ""; // Cambia esto si es necesario
+$dbname = "is"; // Cambia esto si es necesario
 
-if ($connection->connect_error) {
-    die(json_encode(['error' => 'Error de conexión']));
+$conn = new mysqli($servername, $username, $password, $dbname);
+$data = json_decode(file_get_contents("php://input"));
+
+// Verificar la conexión
+if ($conn->connect_error) {
+    die(json_encode(array("success" => false, "message" => "Conexión fallida")));
 }
 
+// Preparar la consulta para obtener las plantas
 $sql = "SELECT id, nombre_comun, nombre_cientifico FROM plantas";
-$result = $connection->query($sql);
+$result = $conn->query($sql);
 
-$plantas = [];
+$plantas = array();
+
 if ($result->num_rows > 0) {
+    // Obtener los datos de las plantas
     while ($row = $result->fetch_assoc()) {
         $plantas[] = $row;
     }
-}
-
-echo json_encode(['data' => $plantas]);
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Ejemplo de lógica para obtener plantas
-    // Aquí iría tu código para conectarte a la base de datos y obtener las plantas
-    echo json_encode(['data' => $plantas]);
+    // Devolver los datos en formato JSON
+    echo json_encode(array("success" => true, "data" => $plantas));
 } else {
-    echo json_encode(['error' => 'Método no permitido']);
+    // No se encontraron plantas
+    echo json_encode(array("success" => true, "data" => [])); // También devolver una lista vacía
 }
 
-$connection->close();
+$conn->close();
 ?>
