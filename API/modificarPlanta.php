@@ -1,14 +1,15 @@
 <?php
-header("Access-Control-Allow-Origin: *"); // Permitir cualquier origen
-header("Access-Control-Allow-Methods: POST, PUT, OPTIONS"); // Métodos permitidos
-header("Access-Control-Allow-Headers: Content-Type"); // Cabeceras permitidas
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: POST, PUT, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Conectar a la base de datos
-$servername = "localhost";
-$username = "root"; // Cambia esto si es necesario
-$password = ""; // Cambia esto si es necesario
-$dbname = "is"; // Cambia esto si es necesario
+$servername = "dbis.cpmigq8o8do7.us-east-2.rds.amazonaws.com"; // Cambia esto por el endpoint de tu base de datos RDS
+$username = "admin"; // Cambia esto por tu usuario de RDS
+$password = "root_0010"; // Cambia esto por tu contraseña de RDS
+$dbname = "dbis"; // Cambia esto por el nombre de tu base de datos en RDS
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -23,14 +24,12 @@ $data = json_decode(file_get_contents("php://input"));
 if (isset($data->id)) {
     $id = $data->id;
     $nombre_comun = $data->nombre_comun;
-    $nombre_cientifico = $data->nombre_cientifico;
     $descripcion = $data->descripcion;
 
-
     // Consultar para modificar la planta
-    $sql = "UPDATE plantas SET nombre_comun = ?, nombre_cientifico = ?, descripcion = ? WHERE id = ?";
+    $sql = "UPDATE plantas SET nombre_comun = ?, descripcion = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $nombre_comun, $nombre_cientifico, $descripcion, $id);
+    $stmt->bind_param("ssi", $nombre_comun, $descripcion, $id); // Cambia a "ssi"
 
     if ($stmt->execute()) {
         echo json_encode(array("success" => true));

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const fetchPlantas = async () => {
-    const response = await axios.get(`http://localhost:5000/api/plants`);
+    const response = await axios.get('http://localhost:5000/api/plants');
     return response.data.data;
 };
 
@@ -19,12 +19,33 @@ const AgregarPlanta = () => {
         descripcion: ''
     });
 
+    
+    
+
     const { data: plantas = [], error, isLoading } = useQuery({
         queryKey: ['plantas'],
         queryFn: fetchPlantas,
     });
 
     const navigate = useNavigate();
+    useEffect(() => {
+        const verificarSesion = async () => {
+          try {
+            const response = await axios.get('http://localhost/API/verificar_sesion.php', { withCredentials: true });
+            console.log(response.data)
+            console.log(response.data.sesion_activa)
+            if (!response.data.sesion_activa) {
+              navigate('/'); // Redirige a la raíz si no hay sesión activa
+            }
+          } catch (error) {
+            console.error('Error al verificar la sesión:', error);
+            navigate('/');
+          }
+        };
+    
+        verificarSesion();
+      }, [navigate]);
+    
     const handlereturn = () => navigate('/Dashboard');
 
     const manejarCambio = (event) => {
@@ -36,18 +57,21 @@ const AgregarPlanta = () => {
 
     const manejarEnvio = async (event) => {
         event.preventDefault();
+
+        // Crear objeto de datos de la planta
         const plantaData = mostrarFormularioManual ? plantaManual : {
             nombre_comun: plantaInfo.common_name,
             nombre_cientifico: plantaInfo.scientific_name,
-            descripcion: plantaInfo.description
+            descripcion: plantaInfo.description,
         };
-
+    
         if (!plantaData.nombre_comun || !plantaData.nombre_cientifico || isSubmitting) return;
-
+    
         setIsSubmitting(true);
-
+    
         try {
-            await axios.post('http://localhost/API/agregarPlanta.php', plantaData);
+            // Enviar datos de la planta al backend para añadirla con el user_id de la sesión
+            await axios.post('http://localhost/API/agregarPlanta.php', plantaData, { withCredentials: true }); // Asegúrate de incluir withCredentials
             alert('Planta agregada correctamente');
             setPlantaSeleccionada('');
             setPlantaInfo(null);

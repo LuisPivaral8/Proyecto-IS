@@ -14,13 +14,15 @@ const LoginForm = () => {
             const response = await axios.post("http://localhost/API/login.php", {
                 username,
                 password,
-            });
+            }, { withCredentials: true });
             if (response.data.success) {
+                // Guardar el user_id en localStorage
+                localStorage.setItem('user_id', response.data.user_id);
                 // Redirigir a la página de dashboard
                 navigate('/Dashboard');
             } else {
                 // Manejar error de inicio de sesión
-                alert("Credenciales incorrectas")
+                alert("Credenciales incorrectas");
             }
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
@@ -54,7 +56,7 @@ const LoginForm = () => {
                     />
                 </div>
                 <button type="submit" className="btn btn-primary w-100">Iniciar Sesión</button>
-                <button onClick={() => navigate("/Signup")} type="submit" className="btn btn-primary w-100 mt-3">Sign up</button>
+                <button onClick={() => navigate("/Signup")} type="button" className="btn btn-secondary w-100 mt-3">Sign up</button>
             </form>
         </div>
     );
