@@ -1,26 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.css';
 import { useNavigate } from 'react-router-dom';
+import { useTable, useFilters, useGlobalFilter } from 'react-table';
+import 'bootstrap/dist/css/bootstrap.css';
+
+// Componente de filtro global (búsqueda)
+const GlobalFilter = ({ globalFilter, setGlobalFilter }) => (
+    <input
+        className="form-control mb-3"
+        value={globalFilter || ''}
+        onChange={(e) => setGlobalFilter(e.target.value)}
+        placeholder="Buscar plantas..."
+    />
+);
 
 const TablaPlantas = () => {
     const [plantas, setPlantas] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedPlanta, setSelectedPlanta] = useState(null);
-    const [nombreComun, setnombreComun] = useState('');
-    const [nombreCientifico, setnombreCientifico] = useState('');
+    const [nombreComun, setNombreComun] = useState('');
+    const [nombreCientifico, setNombreCientifico] = useState('');
     const [description, setDescription] = useState('');
     const navigate = useNavigate('');
 
-    const handlereturn = () => {navigate('/Dashboard')}
+    const handlereturn = () => { navigate('/Dashboard'); }
 
     const fetchPlantas = async () => {
         try {
             const response = await axios.get('http://localhost/API/obtenerPlantas.php');
             if (response.data && response.data.data) {
                 setPlantas(response.data.data);
-                console.log(response.data);
             } else {
                 setError('No se encontraron plantas');
             }
@@ -38,7 +48,7 @@ const TablaPlantas = () => {
                 const response = await axios.delete(`http://localhost/API/eliminarPlanta.php?id=${id}`);
                 if (response.data.success) {
                     alert('Planta eliminada con éxito');
-                    fetchPlantas(); // Recarga las plantas
+                    fetchPlantas();
                 } else {
                     alert('Error al eliminar la planta');
                 }
@@ -54,20 +64,19 @@ const TablaPlantas = () => {
             id: id,
             nombre_comun: nombreComun,
             nombre_cientifico: nombreCientifico,
-            description: description,
+            descripcion: description,
         };
-        console.log(updatedPlanta)
-    
+
         try {
             const response = await axios.put(
                 'http://localhost/API/modificarPlanta.php',
-                updatedPlanta, // Cuerpo de la solicitud
+                updatedPlanta,
                 { headers: { 'Content-Type': 'application/json' } }
             );
             if (response.data.success) {
                 alert('Planta modificada con éxito');
                 setSelectedPlanta(null);
-                fetchPlantas(); // Recarga las plantas
+                fetchPlantas();
             } else {
                 alert('Error al modificar la planta');
             }
@@ -76,58 +85,96 @@ const TablaPlantas = () => {
             alert('Error al modificar la planta');
         }
     };
-    
 
     useEffect(() => {
         fetchPlantas();
     }, []);
 
+    const columns = useMemo(() => [
+        { Header: 'ID', accessor: 'id' },
+        { Header: 'Nombre Común', accessor: 'nombre_comun' },
+        { Header: 'Nombre Científico', accessor: 'nombre_cientifico' },
+        { Header: 'Descripción', accessor: 'descripcion' },
+        {
+            Header: 'Acciones',
+            accessor: 'acciones',
+            Cell: ({ row }) => (
+                <>
+                    <button
+                        className="btn btn-warning me-2"
+                        onClick={() => {
+                            setSelectedPlanta(row.original);
+                            setNombreComun(row.original.nombre_comun);
+                            setNombreCientifico(row.original.nombre_cientifico);
+                            setDescription(row.original.descripcion);
+                        }}
+                    >
+                        Modificar
+                    </button>
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => handleEliminar(row.original.id)}
+                    >
+                        Eliminar
+                    </button>
+                </>
+            ),
+        },
+    ], []);
+
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        rows,
+        prepareRow,
+        state,
+        setGlobalFilter
+    } = useTable(
+        {
+            columns,
+            data: plantas,
+            initialState: { hiddenColumns: ['id'] }
+        },
+        useFilters,
+        useGlobalFilter
+    );
+
+    const { globalFilter } = state;
+
     if (loading) return <p>Cargando plantas...</p>;
     if (error) return <p>{error}</p>;
 
     return (
-        <div className="tabla-container">
+        <div className="tabla-container container mt-4">
             <h2 className="text-center">Lista de Plantas</h2>
-            <table className="table table-bordered table-striped">
+            <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+
+            <table className="table table-bordered table-striped" {...getTableProps()}>
                 <thead className="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre Común</th>
-                        <th>Nombre Científico</th>
-                        <th>Descripción</th>
-                        <th>Acciones</th>
-                    </tr>
+                    {headerGroups.map(headerGroup => (
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroup.headers.map(column => (
+                                <th {...column.getHeaderProps()}>
+                                    {column.render('Header')}
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
                 </thead>
-                <tbody>
-                    {plantas.length > 0 ? (
-                        plantas.map((planta) => (
-                            <tr key={planta.id}>
-                                <td>{planta.id}</td>
-                                <td>{planta.nombre_comun}</td>
-                                <td>{planta.nombre_cientifico}</td>
-                                <td>{planta.description}</td>
-                                <td>
-                                    <button 
-                                        className="btn btn-warning" 
-                                        onClick={() => {
-                                            setSelectedPlanta(planta);
-                                            setnombreComun(planta.nombre_comun);
-                                            setnombreCientifico(planta.nombre_cientifico);
-                                            setDescription(planta.description);
-                                        }}>
-                                        Modificar
-                                    </button>
-                                    <button 
-                                        className="btn btn-danger" 
-                                        onClick={() => handleEliminar(planta.id)}>
-                                        Eliminar
-                                    </button>
-                                </td>
+                <tbody {...getTableBodyProps()}>
+                    {rows.length > 0 ? rows.map(row => {
+                        prepareRow(row);
+                        return (
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map(cell => (
+                                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                ))}
                             </tr>
-                        ))
-                    ) : (
+                        );
+                    }) : (
                         <tr>
-                            <td colSpan="5">No hay plantas disponibles</td>
+                            <td colSpan={columns.length}>No hay plantas disponibles</td>
                         </tr>
                     )}
                 </tbody>
@@ -146,28 +193,28 @@ const TablaPlantas = () => {
                             <div className="modal-body">
                                 <div className="form-group">
                                     <label>Nombre Común</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        value={nombreComun} 
-                                        onChange={(e) => setnombreComun(e.target.value)} 
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={nombreComun}
+                                        onChange={(e) => setNombreComun(e.target.value)}
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label>Nombre Científico</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        value={nombreCientifico} 
-                                        onChange={(e) => setnombreCientifico(e.target.value)} 
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={nombreCientifico}
+                                        onChange={(e) => setNombreCientifico(e.target.value)}
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label>Descripción</label>
-                                    <textarea 
-                                        className="form-control" 
-                                        value={description} 
-                                        onChange={(e) => setDescription(e.target.value)} 
+                                    <textarea
+                                        className="form-control"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
                                     ></textarea>
                                 </div>
                             </div>
@@ -179,7 +226,7 @@ const TablaPlantas = () => {
                     </div>
                 </div>
             )}
-            <center><button onClick={handlereturn} className='btn btn-secondary'>Regresar</button></center>
+            <center><button onClick={handlereturn} className="btn btn-secondary mt-3">Regresar</button></center>
         </div>
     );
 };

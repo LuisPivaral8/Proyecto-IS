@@ -24,12 +24,13 @@ if (isset($data->id)) {
     $id = $data->id;
     $nombre_comun = $data->nombre_comun;
     $nombre_cientifico = $data->nombre_cientifico;
-    $description = $data->description;
+    $descripcion = $data->descripcion;
+
 
     // Consultar para modificar la planta
-    $sql = "UPDATE plantas SET nombre_comun = ?, nombre_cientifico = ?, description = ? WHERE id = ?";
+    $sql = "UPDATE plantas SET nombre_comun = ?, nombre_cientifico = ?, descripcion = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $nombre_comun, $nombre_cientifico, $description, $id);
+    $stmt->bind_param("sssi", $nombre_comun, $nombre_cientifico, $descripcion, $id);
 
     if ($stmt->execute()) {
         echo json_encode(array("success" => true));

@@ -11,7 +11,13 @@ const fetchPlantas = async () => {
 const AgregarPlanta = () => {
     const [plantaSeleccionada, setPlantaSeleccionada] = useState('');
     const [plantaInfo, setPlantaInfo] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar envío
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mostrarFormularioManual, setMostrarFormularioManual] = useState(false);
+    const [plantaManual, setPlantaManual] = useState({
+        nombre_comun: '',
+        nombre_cientifico: '',
+        descripcion: ''
+    });
 
     const { data: plantas = [], error, isLoading } = useQuery({
         queryKey: ['plantas'],
@@ -30,28 +36,34 @@ const AgregarPlanta = () => {
 
     const manejarEnvio = async (event) => {
         event.preventDefault();
-        if (!plantaInfo || isSubmitting) return; // Previene duplicación en envíos
-        
-        setIsSubmitting(true); // Bloquea nuevos envíos
-
-        const plantaData = {
+        const plantaData = mostrarFormularioManual ? plantaManual : {
             nombre_comun: plantaInfo.common_name,
             nombre_cientifico: plantaInfo.scientific_name,
-            descripcion: plantaInfo.description,
-
+            descripcion: plantaInfo.description
         };
+
+        if (!plantaData.nombre_comun || !plantaData.nombre_cientifico || isSubmitting) return;
+
+        setIsSubmitting(true);
 
         try {
             await axios.post('http://localhost/API/agregarPlanta.php', plantaData);
             alert('Planta agregada correctamente');
             setPlantaSeleccionada('');
             setPlantaInfo(null);
+            setMostrarFormularioManual(false);
+            setPlantaManual({ nombre_comun: '', nombre_cientifico: '', descripcion: '' });
         } catch (error) {
             console.error('Error al guardar la planta:', error);
             alert('Error al agregar la planta');
         } finally {
-            setIsSubmitting(false); // Permite envío después del error o éxito
+            setIsSubmitting(false);
         }
+    };
+
+    const manejarCambioFormularioManual = (event) => {
+        const { name, value } = event.target;
+        setPlantaManual({ ...plantaManual, [name]: value });
     };
 
     if (isLoading) return <p>Cargando plantas...</p>;
@@ -60,37 +72,76 @@ const AgregarPlanta = () => {
     return (
         <div className="form-container">
             <h2>Agregar Planta</h2>
-            <form onSubmit={manejarEnvio} className="form-content">
-                <label htmlFor="plantas" className="form-label">Selecciona una planta:</label>
-                <select
-                    id="plantas"
-                    value={plantaSeleccionada}
-                    onChange={manejarCambio}
-                    className="form-select"
-                >
-                    <option value="">Seleccione una planta</option>
-                    {plantas.map((planta) => (
-                        <option key={planta.id} value={planta.id}>
-                            {planta.common_name || planta.scientific_name}
-                        </option>
-                    ))}
-                </select>
+            <button onClick={() => setMostrarFormularioManual(!mostrarFormularioManual)} className="form-button">
+                {mostrarFormularioManual ? 'Cancelar Agregar Manualmente' : 'Agregar Planta Manualmente'}
+            </button>
 
-                {plantaInfo && (
-                    <div className="planta-info">
-                        <h3>Información de la Planta:</h3>
-                        <p><strong>Nombre Común:</strong> {plantaInfo.common_name}</p>
-                        <p><strong>Nombre Científico:</strong> {plantaInfo.scientific_name}</p>
-                    </div>
-                )}
+            {mostrarFormularioManual ? (
+                <form onSubmit={manejarEnvio} className="form-content">
+                    <label className="form-label">Nombre Común:</label>
+                    <input
+                        type="text"
+                        name="nombre_comun"
+                        value={plantaManual.nombre_comun}
+                        onChange={manejarCambioFormularioManual}
+                        className="form-input"
+                        required
+                    />
+                    <label className="form-label">Nombre Científico:</label>
+                    <input
+                        type="text"
+                        name="nombre_cientifico"
+                        value={plantaManual.nombre_cientifico}
+                        onChange={manejarCambioFormularioManual}
+                        className="form-input"
+                        required
+                    />
+                    <label className="form-label">Descripción:</label>
+                    <textarea
+                        name="descripcion"
+                        value={plantaManual.descripcion}
+                        onChange={manejarCambioFormularioManual}
+                        className="form-input"
+                        required
+                    />
+                    <button type="submit" className="form-button" disabled={isSubmitting}>
+                        {isSubmitting ? 'Guardando...' : 'Agregar Planta'}
+                    </button>
+                </form>
+            ) : (
+                <form onSubmit={manejarEnvio} className="form-content">
+                    <label htmlFor="plantas" className="form-label">Selecciona una planta:</label>
+                    <select
+                        id="plantas"
+                        value={plantaSeleccionada}
+                        onChange={manejarCambio}
+                        className="form-select"
+                    >
+                        <option value="">Seleccione una planta</option>
+                        {plantas.map((planta) => (
+                            <option key={planta.id} value={planta.id}>
+                                {planta.common_name || planta.scientific_name}
+                            </option>
+                        ))}
+                    </select>
 
-                <button type="submit" className="form-button" disabled={isSubmitting}>
-                    {isSubmitting ? 'Guardando...' : 'Agregar Planta'}
-                </button>
-                <button style={{ background: 'red' }} onClick={handlereturn} className="form-button mt-3">
-                    Cancelar
-                </button>
-            </form>
+                    {plantaInfo && (
+                        <div className="planta-info">
+                            <h3>Información de la Planta:</h3>
+                            <p><strong>Nombre Común:</strong> {plantaInfo.common_name}</p>
+                            <p><strong>Nombre Científico:</strong> {plantaInfo.scientific_name}</p>
+                        </div>
+                    )}
+
+                    <button type="submit" className="form-button" disabled={isSubmitting}>
+                        {isSubmitting ? 'Guardando...' : 'Agregar Planta'}
+                    </button>
+                </form>
+            )}
+
+            <button style={{ background: 'red' }} onClick={handlereturn} className="form-button mt-3">
+                Cancelar
+            </button>
         </div>
     );
 };
