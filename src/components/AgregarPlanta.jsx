@@ -1,58 +1,61 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-//import './AgregarPlanta.css'; // Importa el archivo CSS
+import { useNavigate } from 'react-router-dom';
 
-// Función para obtener las plantas
 const fetchPlantas = async () => {
     const response = await axios.get(`http://localhost:5000/api/plants`);
-    return response.data.data; // Devuelve la lista de plantas
+    return response.data.data;
 };
 
 const AgregarPlanta = () => {
     const [plantaSeleccionada, setPlantaSeleccionada] = useState('');
-    const [plantaInfo, setPlantaInfo] = useState(null); // Para almacenar la información de la planta seleccionada
+    const [plantaInfo, setPlantaInfo] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar envío
 
-    // Usar useQuery para obtener las plantas
     const { data: plantas = [], error, isLoading } = useQuery({
-        queryKey: ['plantas'], // Clave de la consulta
-        queryFn: fetchPlantas, // Función que realiza la consulta
+        queryKey: ['plantas'],
+        queryFn: fetchPlantas,
     });
 
-    // Función para manejar el cambio de selección en el select
+    const navigate = useNavigate();
+    const handlereturn = () => navigate('/Dashboard');
+
     const manejarCambio = (event) => {
         const idPlanta = event.target.value;
         setPlantaSeleccionada(idPlanta);
-    
         const plantaSeleccionada = plantas.find(planta => planta.id === parseInt(idPlanta));
-        setPlantaInfo(plantaSeleccionada); // Establece la información de la planta seleccionada
+        setPlantaInfo(plantaSeleccionada);
     };
 
     const manejarEnvio = async (event) => {
-        event.preventDefault(); // Previene el comportamiento por defecto del formulario
-    
-        if (!plantaInfo) return; // Asegúrate de que hay una planta seleccionada
-    
+        event.preventDefault();
+        if (!plantaInfo || isSubmitting) return; // Previene duplicación en envíos
+        
+        setIsSubmitting(true); // Bloquea nuevos envíos
+
         const plantaData = {
-            common_name: plantaInfo.common_name,
-            scientific_name: plantaInfo.scientific_name,
-            description: plantaInfo.description,
-            created_at: new Date().toISOString(), // Agrega la fecha de creación
+            nombre_comun: plantaInfo.common_name,
+            nombre_cientifico: plantaInfo.scientific_name,
+            descripcion: plantaInfo.description,
+
         };
-    
+
         try {
-            await axios.post('http://localhost/API/agregarPlanta.php', plantaData); // Asegúrate de tener esta ruta en tu servidor
-            alert('Planta agregada correctamente'); // Mensaje de éxito
-            setPlantaSeleccionada(''); // Reinicia la selección
-            setPlantaInfo(null); // Reinicia la información de la planta
+            await axios.post('http://localhost/API/agregarPlanta.php', plantaData);
+            alert('Planta agregada correctamente');
+            setPlantaSeleccionada('');
+            setPlantaInfo(null);
         } catch (error) {
             console.error('Error al guardar la planta:', error);
             alert('Error al agregar la planta');
+        } finally {
+            setIsSubmitting(false); // Permite envío después del error o éxito
         }
     };
-    
-    if (isLoading) return <p>Cargando plantas...</p>; // Mensaje de carga
-    if (error) return <p>Error al buscar las plantas: {error.message}</p>; // Manejo de errores
+
+    if (isLoading) return <p>Cargando plantas...</p>;
+    if (error) return <p>Error al buscar las plantas: {error.message}</p>;
 
     return (
         <div className="form-container">
@@ -81,7 +84,12 @@ const AgregarPlanta = () => {
                     </div>
                 )}
 
-                <button type="submit" className="form-button">Agregar Planta</button>
+                <button type="submit" className="form-button" disabled={isSubmitting}>
+                    {isSubmitting ? 'Guardando...' : 'Agregar Planta'}
+                </button>
+                <button style={{ background: 'red' }} onClick={handlereturn} className="form-button mt-3">
+                    Cancelar
+                </button>
             </form>
         </div>
     );

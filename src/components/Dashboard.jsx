@@ -15,11 +15,15 @@ const Dashboard = () => {
   };
 
   const goToModifyGarden = () => {
-    navigate('/modificar-huerto');
+    navigate('/modificar');
   };
 
   const goToEnyclopedia = () => {
     navigate('/enciclopedia');
+  };
+
+  const goToEditProfile = () => {
+    navigate('/editprofile');
   };
 
   return (
@@ -48,6 +52,12 @@ const Dashboard = () => {
           <div className="dashboard-btn btn-encyclopedia" onClick={goToEnyclopedia}>
             <img src="enciclopedia.png" alt="Enciclopedia" className="dashboard-icon" />
             <span>Enciclopedia</span>
+          </div>
+        </div>
+        <div className="col-md-6 mb-4">
+          <div className="dashboard-btn btn-encyclopedia" onClick={goToEditProfile}>
+            <img src="perfiledit.png" alt="Enciclopedia" className="dashboard-icon" />
+            <span>Perfil</span>
           </div>
         </div>
       </div>

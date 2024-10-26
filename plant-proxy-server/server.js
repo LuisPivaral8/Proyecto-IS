@@ -21,12 +21,12 @@ app.get('/api/plants', async (req, res) => {
 });
 
 app.post('/api/guardar-planta', async (req, res) => {
-    const { common_name, scientific_name, description, created_at } = req.body;
+    const { nombre_comun, nombre_cientifico, description, fecha_creacion } = req.body;
 
     // Aquí deberías tener tu lógica para guardar la planta en la base de datos
     try {
         // Supón que tienes una función llamada guardarPlanta que se encarga de esto
-        await guardarPlanta({ common_name, scientific_name, description, created_at });
+        await guardarPlanta({ nombre_comun, nombre_cientifico, description, fecha_creacion });
         res.status(201).json({ message: 'Planta guardada correctamente' });
     } catch (error) {
         console.error('Error al guardar la planta:', error);

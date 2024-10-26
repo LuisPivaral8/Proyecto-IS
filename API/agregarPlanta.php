@@ -25,16 +25,26 @@ $nombre_cientifico = $data['nombre_cientifico'];
 $descripcion = $data['descripcion'];
 $fecha_creacion = $data['fecha_creacion'];
 
-// Preparar la consulta SQL
-$sql = "INSERT INTO plantas (nombre_comun, nombre_cientifico, descripcion, fecha_creacion)
+//VALIDAR QUE NO HAYAN CAMPOS VACIOS
+if($nombre_comun.length() > 1){
+    $sql = "INSERT INTO plantas (nombre_comun, nombre_cientifico, descripcion, fecha_creacion)
         VALUES ('$nombre_comun', '$nombre_cientifico', '$descripcion', '$fecha_creacion')";
 
-// Ejecutar la consulta
-if ($conn->query($sql) === TRUE) {
-    echo json_encode(['success' => true, 'message' => 'Planta agregada exitosamente']);
+    // Ejecutar la consulta
+    if ($conn->query($sql) === TRUE) {
+        
+        echo json_encode(['success' => true, 'message' => 'Planta agregada exitosamente']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error al agregar la planta']);
+        
+    }
+
+
 } else {
-    echo json_encode(['success' => false, 'message' => 'Error al agregar la planta']);
+    echo json_encode(['success' => false, 'message' => 'Error al agregar la planta']);  
 }
+// Preparar la consulta SQL
+
 
 // Cerrar conexión
 $conn->close();

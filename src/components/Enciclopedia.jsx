@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Enciclopedia.css'; // Importar el archivo de estilos
+import { useNavigate } from 'react-router-dom';
 
 const Enciclopedia = () => {
+    const navigate = useNavigate();
+    const handlereturn = () => {navigate('/Dashboard')}
     const [plantas, setPlantas] = useState([
+        
         {
             nombre: 'Aloe Vera',
             descripcion: 'Planta suculenta conocida por sus propiedades medicinales y su capacidad para almacenar agua.',
@@ -231,6 +235,7 @@ const Enciclopedia = () => {
                     </div>
                 ))}
             </div>
+            <button onClick={handlereturn}>Regresar</button>
         </div>
     );
 };
