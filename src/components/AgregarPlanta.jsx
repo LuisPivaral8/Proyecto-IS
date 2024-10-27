@@ -77,6 +77,7 @@ const AgregarPlanta = () => {
             setPlantaInfo(null);
             setMostrarFormularioManual(false);
             setPlantaManual({ nombre_comun: '', nombre_cientifico: '', descripcion: '' });
+            navigate('/modificar');
         } catch (error) {
             console.error('Error al guardar la planta:', error);
             alert('Error al agregar la planta');

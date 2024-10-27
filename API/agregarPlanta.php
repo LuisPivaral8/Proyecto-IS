@@ -18,9 +18,7 @@ $dbname = "dbis"; // Cambia esto por el nombre de tu base de datos en RDS
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Error de conexión a la base de datos']));
-}
+
 
 $data = json_decode(file_get_contents("php://input"), true);
 $nombre_comun = $data['nombre_comun'];
@@ -28,10 +26,6 @@ $nombre_cientifico = $data['nombre_cientifico'];
 $descripcion = $data['descripcion'];
 $usuario_id = $_SESSION['user_id']; // Debe coincidir con el nombre de la variable de sesión
 
-if (empty($nombre_comun) || empty($nombre_cientifico) || empty($descripcion)) {
-    echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios']);
-    exit;
-}
 
 $sql = "INSERT INTO plantas (nombre_comun, nombre_cientifico, descripcion, fecha_creacion, usuario_id)
         VALUES (?, ?, ?, CURDATE(), ?)";

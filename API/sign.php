@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *"); // Permitir cualquier origen
+header("Access-Control-Allow-Origin: http://localhost:3000"); // Permitir cualquier origen
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Métodos permitidos
 header("Access-Control-Allow-Headers: Content-Type"); // Cabeceras permitidas
 header("Content-Type: application/json; charset=UTF-8");
@@ -21,12 +21,13 @@ if ($conn->connect_error) {
 // Obtener los datos desde la solicitud
 $data = json_decode(file_get_contents("php://input"));
 
-if (isset($data->username) && isset($data->password)) {
+if (isset($data->username) && isset($data->password) && isset($data->email)) {
+    $email = $data->email;
     $username = $data->username;
     $password = $data->password;
 
     // Verificar si el usuario ya existe
-    $sql = "SELECT * FROM usuarios WHERE username = ?";
+    $sql = "SELECT * FROM Usuarios WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -38,9 +39,9 @@ if (isset($data->username) && isset($data->password)) {
     } else {
         // Encriptar la contraseña y crear el nuevo usuario
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $insertSql = "INSERT INTO usuarios (username, password) VALUES (?, ?)";
+        $insertSql = "INSERT INTO Usuarios (email, username, password) VALUES (?, ?, ?)";
         $insertStmt = $conn->prepare($insertSql);
-        $insertStmt->bind_param("ss", $username, $hashedPassword);
+        $insertStmt->bind_param("sss", $email, $username, $hashedPassword);
 
         if ($insertStmt->execute()) {
             echo json_encode(array("success" => true));

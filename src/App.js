@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
+//import Navbar from './Navbar';
 import SignupForm from './components/SignupForm';
 import AgregarPlanta from './components/AgregarPlanta';
 import Enciclopedia from './components/Enciclopedia'
@@ -24,7 +25,7 @@ const App = () => {
           <Route path="/agregar" element={<AgregarPlanta />} />
           <Route path="/enciclopedia" element={<Enciclopedia />} />
           <Route path="/modificar" element={<TablaPlantas />} />
-          <Route path="/editprofile" element={<EditProfile />} />
+         { /* <Route path="/editprofile" element={<EditProfile />} /> */}
           <Route path="/modify" element={<ModifyProfile />} />
         </Routes>
       </Router>

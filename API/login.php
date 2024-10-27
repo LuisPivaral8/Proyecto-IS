@@ -20,13 +20,13 @@ if ($conn->connect_error) {
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (isset($data->username) && isset($data->password)) {
-    $username = $data->username;
+if (isset($data->email) && isset($data->password)) {
+    $email = $data->email;
     $password = $data->password;
 
-    $sql = "SELECT * FROM usuarios WHERE username = ?";
+    $sql = "SELECT * FROM Usuarios WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -34,6 +34,7 @@ if (isset($data->username) && isset($data->password)) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
             $_SESSION['user_id'] = $row['id'];
+            $_SESSION['username'] = $row['username'];
             echo json_encode(array("success" => true, "user_id" => $row['id'], "session" => $_SESSION));
             exit;
             

@@ -38,7 +38,7 @@ const Dashboard = () => {
   const goToCreateGarden = () => navigate('/crear-nuevo-huerto');
   const goToModifyGarden = () => navigate('/modificar');
   const goToEnyclopedia = () => navigate('/enciclopedia');
-  const goToEditProfile = () => navigate('/editprofile');
+  const goToEditProfile = () => navigate('/modify');
 
   return (
     <div className="container mt-5">
