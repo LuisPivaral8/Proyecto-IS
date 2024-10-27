@@ -14,6 +14,7 @@ const TablaPlantas = () => {
     const navigate = useNavigate('');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const verificarSesion = async () => {
           try {
             const response = await axios.get('http://localhost/API/verificar_sesion.php', { withCredentials: true });

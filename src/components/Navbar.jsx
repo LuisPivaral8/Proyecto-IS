@@ -18,13 +18,19 @@ const Navbar = () => {
 
     const styles = {
         navbar: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '10px 20px',
+            width: '100%',
+            zIndex: 1000,
             backgroundColor: '#4CAF50',
             color: '#fff',
             fontSize: '1.1rem',
+            height: '60px',
         },
         username: {
             marginRight: '20px',

@@ -8,6 +8,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const verificarSesion = async () => {
       try {
         const response = await axios.get('http://localhost/API/verificar_sesion.php', { withCredentials: true });
@@ -25,14 +26,6 @@ const Dashboard = () => {
     verificarSesion();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      await axios.get('http://localhost/API/logout.php', { withCredentials: true });
-      navigate('/');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
-  };
 
   const goToNewPlant = () => navigate('/agregar');
   const goToCreateGarden = () => navigate('/crear-nuevo-huerto');
@@ -43,7 +36,6 @@ const Dashboard = () => {
   return (
     <div className="container mt-5">
       <h1 className="text-center">Dashboard</h1>
-      <button onClick={handleLogout} className="btn btn-danger mb-4">Cerrar Sesión</button>
       <div className="row mt-4">
         <div className="col-md-6 mb-4">
           <div className="dashboard-btn btn-new-plant" onClick={goToNewPlant}>
